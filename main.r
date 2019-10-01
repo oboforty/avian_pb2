@@ -17,7 +17,7 @@ data = droplevels(data)
 ###########
 # DATA Poking
 dim(data)
-attributes(data)
+attr = attributes(data)$names
 table(data$Host)
 
 ###########
@@ -26,25 +26,41 @@ table(data$Host)
 ?mcfs
 
 
-n_projections = 100
-cutoff_pe = 20
-proj_size = 0.1
+# no. of subsets:
+n_projections = 1500
+
+# number of trees generated per subset
+# no. of classifiers (trees) := splits * n_projections
 splits = 5
+
+# no./percent of loci in a subset:
+proj_size = 0.2
+
+# cutoff permutations
+cutoff_pe = 20
+
 splitSetSize = 0.66
 
-#if(file.exists("result.rds")) {
-#  result <- readRDS("result.rds")
-#} else {
-  
-  result <- mcfs(Host~., data, projections=n_projections,
+# -----------------------------
+
+print(paste("Attributes per tree:", length(attr)*proj_size))
+
+
+# MCFS:
+result <- mcfs(Host~., data, projections=n_projections,
                  projectionSize=proj_size, splits=splits, splitSetSize=splitSetSize,
                  cutoffPermutations = cutoff_pe, threadsNumber = 8)
-  
-#  saveRDS(result, "result.rds")
-#}
+# Save and load the results
+saveRDS(result, "result.rds")
+
+if(file.exists("result.rds")) {
+  result <- readRDS("result.rds")
+}
 
 # Most significant
 most_sig <- result$RI[1:result$cutoff_value,]
+dim(most_sig)
+
 
 
 # Distances graph (projections convergence)
