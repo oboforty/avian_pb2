@@ -12,6 +12,7 @@ data <- read.table("data/Project5.csv", sep="\t", header=FALSE)
 first_row = data[1,]
 data = data[-1,]
 colnames(data) <- as.character(unlist(first_row))
+data = droplevels(data)
 
 ###########
 # DATA Poking
@@ -25,14 +26,22 @@ table(data$Host)
 ?mcfs
 
 
-n_projections = 3000
+n_projections = 100
+cutoff_pe = 20
+proj_size = 0.1
+splits = 5
+splitSetSize = 0.66
 
+#if(file.exists("result.rds")) {
+#  result <- readRDS("result.rds")
+#} else {
+  
+  result <- mcfs(Host~., data, projections=n_projections,
+                 projectionSize=proj_size, splits=splits, splitSetSize=splitSetSize,
+                 cutoffPermutations = cutoff_pe, threadsNumber = 8)
+  
+#  saveRDS(result, "result.rds")
+#}
 
-if(file.exists("result.rds")) {
-  result <- readRDS("result.rds")
-} else {
-  
-  #result <- mcfs(...)
-  
-  saveRDS(result, "result.rds")
-}
+head(result$RI)
+plot(result, type="distances")
