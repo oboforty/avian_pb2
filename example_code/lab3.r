@@ -13,7 +13,6 @@ alizadeh[1:n,c(1:n, length(alizadeh))]
 alizadeh$class
 
 
-#n_projections = 1500
 n_projections = 3000
 
 
