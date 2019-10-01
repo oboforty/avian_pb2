@@ -43,5 +43,14 @@ splitSetSize = 0.66
 #  saveRDS(result, "result.rds")
 #}
 
-head(result$RI)
+# Most significant
+most_sig <- result$RI[1:result$cutoff_value,]
+
+
+# Distances graph (projections convergence)
 plot(result, type="distances")
+
+# Interdependency graph
+gid <- build.idgraph(result, size = result$cutoff_value)
+plot.idgraph(gid, label_dist = 0.3)
+
