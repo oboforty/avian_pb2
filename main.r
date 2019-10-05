@@ -33,8 +33,7 @@ table(data$Host)
 # MCFS feature selection
 ###?mcfs
 
-
-n_projections <- 10000
+n_projections <- 100
 cutoff_pe <- 20
 proj_size <- 0.1
 splits <- 5
@@ -53,15 +52,27 @@ result <- mcfs(Host~., data, projections=n_projections,projectionSize=proj_size,
 head(result$RI)
 plot(result, type="distances")
 
+
+# Extract Features
 most_sig <- result$RI[1:result$cutoff_value,]
 sig_featname <- most_sig$attribute
-rule_df <- select(data,sig_featname)
+rule_df <- select(data,sig_featname,Host)
+
+
+#Interdependency Graph
+gid <- build.idgraph(result, size = 20)
+plot.idgraph(gid, label_dist = 0.3)
 
 
 #Rosetta Rule Building
 ross_results <- rosetta(rule_df, discrete = TRUE, reducer = "Genetic")
 rule_table_info <- ross_results$main
 viewRules(rule_table_info)
+
+
+#ROC Plot
+roc_rules <- rosetta(rule_df, discrete = TRUE, reducer = "Genetic", roc = TRUE, clroc = 'Avian')
+plotMeanROC(roc_rules)
 
 
 #Visunet Visualisation
