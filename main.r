@@ -1,11 +1,18 @@
-install.packages("rJava")
-install.packages("rmcfs")
+#### Packages Required ###
+
+# UNCOMMENT THESE LINES IF THE PACKAGES ARE NOT INSTALLED
+
+# install.packages("rJava")
+# install.packages("rmcfs")
+# install.packages("dplyr")
+# devtools::install_github("komorowskilab/VisuNet")
 
 Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_131')
 
 library(rmcfs)
 library(dplyr)
 library(R.ROSETTA)
+library(VisuNet)
 ###########
 
 # PREPARE DATASET
@@ -47,6 +54,7 @@ head(result$RI)
 plot(result, type="distances")
 
 most_sig <- result$RI[1:result$cutoff_value,]
+sig_featname <- most_sig$attribute
 rule_df <- select(data,sig_featname)
 
 
