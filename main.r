@@ -1,9 +1,14 @@
+
 install.packages("rJava")
 install.packages("rmcfs")
-
 Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_131')
 library(rmcfs)
 
+
+install.packages("devtools")
+library(devtools)
+install_github("komorowskilab/R.ROSETTA", force=TRUE)
+library(R.ROSETTA)
 
 ###########
 
@@ -59,8 +64,8 @@ if(file.exists("result.rds")) {
 
 # Most significant
 most_sig <- result$RI[1:result$cutoff_value,]
+sig_cols = most_sig$attribute
 dim(most_sig)
-
 
 
 # Distances graph (projections convergence)
@@ -69,4 +74,24 @@ plot(result, type="distances")
 # Interdependency graph
 gid <- build.idgraph(result, size = result$cutoff_value)
 plot.idgraph(gid, label_dist = 0.3)
+
+# ---------------------------------
+# Classifier
+
+# Create information system
+sig_data = data[c("id", sig_cols, "Host")]
+
+# just to be sure
+stopifnot( nrow(sig_data) == nrow(data) )
+
+?rosetta
+#out = rosetta(autcon)
+out_johnson = rosetta(sig_data, discrete=TRUE, reducer="Johnson")
+
+out_genetic = rosetta(sig_data, discrete=TRUE, reducer="Genetic")
+
+rules_J = out_johnson$main[which(out_johnson$main$pValue < 0.05),]
+rules_G = out_genetic$main[which(out_genetic$main$pValue < 0.05),]
+
+viewRules(rules_G)
 
