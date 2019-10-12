@@ -1,60 +1,93 @@
-install.packages("rJava")
-install.packages("rmcfs")
-
-Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_131')
-
+library(devtools)
 library(rmcfs)
 library(dplyr)
 library(R.ROSETTA)
-###########
+library(VisuNet)
 
-# PREPARE DATASET
-data <- read.table("data/Project5.csv", sep="\t", header=FALSE)
-first_row <- data[1,]
-data <- data[-1,]
-colnames(data) <- as.character(unlist(first_row))
-data <- droplevels(data)
 
-###########
-# DATA Poking
+###############################
+#                             #
+#     Input Parameters        #
+#                             #
+###############################
+
+filename <- "data/Project5.csv"
+filename_results <- 'output/mcfs.rds'
+
+# MCFS parameters
+nr_projections <- 'auto'
+projection_size <- 'auto'
+cutoff_method <- 'permutations'
+cutoff_permutations <- 20
+
+splits <- 5
+splitset_size <- 0.66
+
+# Rosetta parameters
+classifier <- "StandardVoter"
+cvNum <- 10
+reducer <- "Genetic"
+JohnsonParam <- list(Modulo=TRUE, BRT=FALSE, BRTprec=0.9, 
+  Precompute=FALSE, Approximate=TRUE, Fraction=0.95
+)
+GeneticParam <- list(
+  Modulo=TRUE, BRT=FALSE, BRTprec=0.9,
+  Precompute=FALSE, Approximate=TRUE, Fraction=0.95, Algorithm="Simple")
+underSample <- FALSE
+underSampleNum <- 0
+underSampleSize <- 0
+
+# ROC parameters
+host_clroc <- 'human'
+
+
+###############################
+#                             #
+#        Load dataset         #
+#                             #
+###############################
+
+load_protein_IS <- function(filename) {
+  # loads file without header
+  # this fixes a bug where T and F proteins are interpreted as booleans
+  data <- read.table(filename, sep="\t", header=FALSE)
+
+  # drop the header row and readd it as column names
+  first_row <- data[1,]
+  data <- data[-1,]
+  colnames(data) <- as.character(unlist(first_row))
+  data <- droplevels(data)
+
+  return(data)
+}
+
+data = load_protein_IS(filename)
+
+
 dim(data)
 attributes(data)
 table(data$Host)
 
-###########
 
-# MCFS feature selection
-###?mcfs
-
-
-n_projections <- 10000
-cutoff_pe <- 20
-proj_size <- 0.1
-splits <- 5
-splitSetSize <- 0.66
-
-#if(file.exists("result.rds")) {
-#  result <- readRDS("result.rds")
-#} else {
-  
-result <- mcfs(Host~., data, projections=n_projections,projectionSize=proj_size, splits=splits, splitSetSize=splitSetSize,
-               cutoffPermutations = cutoff_pe, threadsNumber = 8)
-  
-#  saveRDS(result, "result.rds")
-#}
-
-head(result$RI)
-plot(result, type="distances")
-
-most_sig <- result$RI[1:result$cutoff_value,]
-rule_df <- select(data,sig_featname)
+attr = attributes(data)$names
+print(paste("Attributes per tree:", length(attr)*proj_size))
 
 
-#Rosetta Rule Building
-ross_results <- rosetta(rule_df, discrete = TRUE, reducer = "Genetic")
-rule_table_info <- ross_results$main
-viewRules(rule_table_info)
+
+###############################
+#                             #
+#            MCFS             #
+#                             #
+###############################
 
 
-#Visunet Visualisation
-visunet(rule_table_info)
+ross_results <- rosetta(rule_df, discrete=TRUE, reducer=reducer, roc=TRUE, clroc=host_clroc, 
+  classifier=classifier, cvNum=cvNum, reducer=reducer, JohnsonParam=JohnsonParam, GeneticParam=GeneticParam, 
+  underSample=underSample, underSampleNum=underSampleNum, underSampleSize=underSampleSize)
+
+###############################
+#                             #
+#          Rosetta            #
+#                             #
+###############################
+

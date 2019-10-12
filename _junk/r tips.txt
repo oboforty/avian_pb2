@@ -1,0 +1,52 @@
+
+with(iris, Sepal.Length / Sepal.Width)
+
+rm() - clean variables
+
+poking:  head, summary, summarise_each
+
+unique(iris$Species)
+
+subset(iris, Species == "virginica")
+
+
+------------------------------------------
+
+  histogram <- function(x, bins = NULL) {
+      if (is.null(bins)) bins <- nclass.Sturges(x)
+      ...
+  }
+
+------------------------------------------
+Good R code:
+- first lines: library
+
+- define all input params as individual variables before
+
+- saveRDS
+
+- separate subparts with comments
+
+- Do wrap long lines!
+
+- USE FUNCTIONS!
+
+- Consider attach("myStuff.rda") instead of load("myStuff.rda")
+
+- to avoid floating errors, use functions always!
+  e.g. log1p(x) instead of log(1 + x)
+
+- comments:
+## for the usually indented comments,
+# for end-of-line comments, and
+### for the (major) “sectioning” or beginning-of-line
+ones
+
+------------------------------------------
+packages:
+
+dplyr: robust functions for manipulating and summarizing tabular data
+
+reshape2: functions for transforming datasets
+
+ggplot2: comprehensive data visualization functions
