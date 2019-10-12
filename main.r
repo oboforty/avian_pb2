@@ -4,6 +4,7 @@ library(dplyr)
 library(R.ROSETTA)
 library(VisuNet)
 
+Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jdk-12.0.2')
 
 ###############################
 #                             #
@@ -17,7 +18,7 @@ filename_results <- 'output/mcfs.rds'
 # MCFS parameters
 nr_projections <- 'auto'
 projection_size <- 'auto'
-cutoff_method <- 'permutations'
+cutoff_method <- 'criticalAngle'
 cutoff_permutations <- 20
 
 splits <- 5
@@ -80,7 +81,14 @@ print(paste("Attributes per tree:", length(attr)*proj_size))
 #                             #
 ###############################
 ?mcfs
+mcfs_result <- mcfs(Host~., data, projections=nr_projections,projectionSize=projection_size, splits=splits, splitSetSize=splitset_size, 
+                    cutoffMethod = cutoff_method, cutoffPermutations = cutoff_permutations, threadsNumber = 8)
 
+head(mcfs_result$RI)
+plot(mcfs_result, type="distances")
+
+gid <- build.idgraph(mcfs_result, size = 20)
+plot.idgraph(gid, label_dist = 0.3)
 
 ###############################
 #                             #

@@ -1,0 +1,6 @@
+table(data$Host)
+
+- no need to undersample
+Avian Human
+  136   136
+
