@@ -92,6 +92,3 @@ print(paste("Attributes per tree:", length(attr)*proj_size))
 ross_results <- rosetta(rule_df, discrete=TRUE, reducer=reducer, roc=TRUE, clroc=host_clroc, 
                         classifier=classifier, cvNum=cvNum, reducer=reducer, JohnsonParam=JohnsonParam, GeneticParam=GeneticParam, 
                         underSample=underSample, underSampleNum=underSampleNum, underSampleSize=underSampleSize)
-
-
-
