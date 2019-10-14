@@ -1,4 +1,5 @@
 library(devtools)
+Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_131')
 library(rmcfs)
 library(dplyr)
 library(R.ROSETTA)
@@ -13,6 +14,7 @@ library(VisuNet)
 
 filename <- "data/Project5.csv"
 output_dir <- "output"
+mcfs_result_file <- "mcfs_result.rds"
 
 # MCFS parameters
 n_projections <- 10000
@@ -76,23 +78,38 @@ table(data$Host)
 #                             #
 ###############################
 
-result <- mcfs(Host~., data, projections=n_projections,projectionSize=proj_size, splits=splits, splitSetSize=splitSetSize,
+mcfs_result <- mcfs(Host~., data, projections=n_projections,projectionSize=proj_size, splits=splits, splitSetSize=splitset_size,
                cutoffPermutations = cutoff_pe, threadsNumber = 8)
 
-head(result$RI)
-plot(result, type="distances")
+# Cache the results:
+saveRDS(mcfs_result, mcfs_result_file)
+#  mcfs_result <- loadRDS(mcfs_result_file)
 
-most_sig <- result$RI[1:result$cutoff_value,]
+
+head(mcfs_result$RI)
+plot(mcfs_result, type="distances")
+
+most_sig <- mcfs_result$RI[1:mcfs_result$cutoff_value,]
 most_sig_names <- most_sig$attribute
-rule_df <- select(data,most_sig_names,Host)
+#saveRDS(most_sig_names, "most_sig_names.rds")
 
-write.csv(rule_df,file = "sig_feat_table.csv")
+
+
+rule_df <- select(data, most_sig_names, Host)
+
+#write.csv(rule_df,file = "sig_feat_table.csv")
 
 
 #classifier = ObjectTrackingVoter. StandardVoter, NaiveBayesClassifier
 #reducer = Johnson, Genetic
 
 
-rules =rosetta(rule_df,roc = TRUE, clroc = "Human",classifier = "StandardVoter", reducer = "Johnson")
+rules =rosetta(rule_df,roc = TRUE, discrete=TRUE, clroc = "Human",classifier = "NaiveBayesClassifier", reducer = "Johnson")
+
+viewRules(rules$main)
+
 plotMeanROC(rules)
+
+
+
 
