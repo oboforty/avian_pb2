@@ -30,7 +30,7 @@ splitset_size <- 0.66
 # StandardVoter, ObjectTrackingVoter, NaiveBayesClassifier
 classifier <- "StandardVoter"
 # Johnson, Genetic
-reducer <- "Johnson"
+reducer <- "Genetic"
 
 #cvNum <- 10
 #JohnsonParam <- list(Modulo=TRUE, BRT=FALSE, BRTprec=0.9, 
@@ -55,7 +55,6 @@ load_mcfs_results <- function() {
     mcfs_result <- readRDS(mcfs_result_file)
     
     return (mcfs_result)
-    
   }
 }
 
@@ -129,10 +128,14 @@ rule_df <- select(data, most_sig_names, Host)
 
 rules =rosetta(rule_df,roc = TRUE, discrete=TRUE, clroc = host_clroc, classifier = classifier, reducer = reducer)
 
+rules$quality
+
+rules$ROC.stats
+
 viewRules(rules$main)
 
-plotMeanROC(rules)
 
+plotMeanROC(rules)
 
 
 
