@@ -1,0 +1,8 @@
+"","rule","length","accuracy","support","pValue"
+"1","IF P635(E) THEN Avian",1,1,124,2.78351904380751e-63
+"2","IF P635(K) THEN Human",1,1,122,3.41822256203849e-61
+"3","IF P471(I) THEN Avian",1,1,119,2.94206415914652e-58
+"4","IF P275(T) THEN Avian",1,1,115,1.19743903833153e-54
+"5","IF P575(X) THEN Avian",1,1,1,1
+"6","IF P275(I) THEN Human",1,1,1,1
+"7","IF P483(X) THEN Avian",1,1,1,1
